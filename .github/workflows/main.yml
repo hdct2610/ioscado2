@@ -1,0 +1,65 @@
+name: Build ioscado IPA (Auto Find)
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Create global.json to Force .NET 8
+      run: dotnet new globaljson --sdk-version 8.0.400 --roll-forward latestFeature
+        
+    - name: Install MAUI Workload
+      run: dotnet workload install maui
+
+    - name: Publish App
+      # SỬA QUAN TRỌNG:
+      # 1. Đổi ArchiveOnBuild=false (Để file .app hiện ra ngay thư mục publish)
+      # 2. Vẫn giữ MtouchLink=None và SupportedOSPlatformVersion=14.0
+      run: |
+        dotnet publish ioscado/ioscado.csproj -f net8.0-ios -r ios-arm64 -c Release -p:ArchiveOnBuild=false -p:EnableCodeSigning=false -p:CodesignKey="-" -p:CheckEolTargetFramework=false -p:TargetFrameworks=net8.0-ios -p:PlatformTarget=arm64 -p:_SuppressSdkMismatch=true -p:SupportedOSPlatformVersion=14.0 -p:MtouchLink=None
+    
+    - name: Create IPA (Auto Search)
+      run: |
+        # 1. Quay về thư mục gốc để tìm kiếm
+        cd ioscado
+        
+        # 2. Dùng lệnh tìm kiếm file .app ở bất cứ đâu
+        echo "Dang tim file .app..."
+        APP_PATH=$(find . -name "*.app" -type d | head -n 1)
+        
+        if [ -z "$APP_PATH" ]; then
+          echo "LOI: Khong tim thay file .app nao ca!"
+          # Liệt kê file để debug xem nó nằm đâu
+          ls -R
+          exit 1
+        fi
+        
+        echo "Da tim thay app tai: $APP_PATH"
+        
+        # 3. Tạo Payload và copy file tìm được vào
+        mkdir Payload
+        cp -r "$APP_PATH" Payload/
+        
+        # 4. Nén lại
+        zip -r ioscado.ipa Payload
+        
+        # 5. Di chuyển ra ngoài để upload
+        mv ioscado.ipa ../
+
+    - name: Upload IPA
+      uses: actions/upload-artifact@v4
+      with:
+        name: ioscado-IPA
+        path: ioscado.ipa
