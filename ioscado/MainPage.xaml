@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             x:Class="ioscado.MainPage"
+             BackgroundColor="Black"
+             ios:Page.UseSafeArea="True"
+             Title="">
+
+    <Grid>
+        <BoxView IsVisible="True" Opacity="0.5">
+            <BoxView.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#001529" Offset="0.0" />
+                    <GradientStop Color="#000000" Offset="0.4" />
+                    <GradientStop Color="#051a05" Offset="1.0" />
+                </LinearGradientBrush>
+            </BoxView.Background>
+        </BoxView>
+
+        <Grid RowDefinitions="Auto, Auto, Auto, *" Padding="16,0,16,0" RowSpacing="12">
+
+            <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="0,5,0,5" HeightRequest="40">
+                <StackLayout VerticalOptions="Center">
+                    <Label Text="SCOUT AI" 
+                           TextColor="White" 
+                           FontSize="28" 
+                           FontAttributes="Bold" 
+                           FontFamily="Helvetica Neue"/>
+                </StackLayout>
+
+                <Border Grid.Column="1" Stroke="#333" StrokeThickness="1" BackgroundColor="#1C1C1E" StrokeShape="RoundRectangle 10" Padding="8,4" VerticalOptions="Center">
+                    <Label Text="v26.0 PRO" TextColor="#0A84FF" FontSize="11" FontAttributes="Bold"/>
+                </Border>
+            </Grid>
+
+            <Grid Grid.Row="1" ColumnDefinitions="*, *" ColumnSpacing="12" HeightRequest="60">
+
+                <Button x:Name="btnNhapDuLieu"
+                        Grid.Column="0"
+                        Text="SCAN DATA"
+                        Clicked="OnNhapDuLieuClicked"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        FontSize="13"
+                        CornerRadius="16"
+                        BorderWidth="0">
+                    <Button.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="#0055FF" Offset="0.0"/>
+                            <GradientStop Color="#00A3FF" Offset="1.0"/>
+                        </LinearGradientBrush>
+                    </Button.Background>
+                    <Button.Shadow>
+                        <Shadow Brush="#0055FF" Offset="0,4" Radius="8" Opacity="0.3"/>
+                    </Button.Shadow>
+                </Button>
+
+                <Button Grid.Column="1"
+                        Text="VERDICT"
+                        Clicked="OnPromptKetHopClicked"
+                        TextColor="#0a0a0a"
+                        FontAttributes="Bold"
+                        FontSize="13"
+                        CornerRadius="16"
+                        BorderWidth="0">
+                    <Button.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="#00FF88" Offset="0.0"/>
+                            <GradientStop Color="#80FFB0" Offset="1.0"/>
+                        </LinearGradientBrush>
+                    </Button.Background>
+                    <Button.Shadow>
+                        <Shadow Brush="#00FF88" Offset="0,4" Radius="8" Opacity="0.3"/>
+                    </Button.Shadow>
+                </Button>
+            </Grid>
+
+            <Border Grid.Row="2" Stroke="#333" StrokeThickness="1" BackgroundColor="#111111" StrokeShape="RoundRectangle 16" HeightRequest="50" Padding="5">
+                <Grid ColumnDefinitions="*, *, *">
+                    <Grid Grid.Column="0">
+                        <RadioButton x:Name="radPrompt1" IsChecked="True" GroupName="Mode" VerticalOptions="Center" HorizontalOptions="Center" Scale="0.8"/>
+                        <Label Text="Think" TextColor="#AAA" FontSize="10" FontAttributes="Bold" VerticalOptions="End" HorizontalOptions="Center" Margin="0,0,0,2" InputTransparent="True"/>
+                    </Grid>
+
+                    <Grid Grid.Column="1">
+                        <RadioButton x:Name="radPrompt2" GroupName="Mode" VerticalOptions="Center" HorizontalOptions="Center" Scale="0.8"/>
+                        <Label Text="Score" TextColor="#AAA" FontSize="10" FontAttributes="Bold" VerticalOptions="End" HorizontalOptions="Center" Margin="0,0,0,2" InputTransparent="True"/>
+                    </Grid>
+
+                    <Grid Grid.Column="2">
+                        <RadioButton x:Name="radPrompt3" GroupName="Mode" VerticalOptions="Center" HorizontalOptions="Center" Scale="0.8"/>
+                        <Label Text="Scout" TextColor="#AAA" FontSize="10" FontAttributes="Bold" VerticalOptions="End" HorizontalOptions="Center" Margin="0,0,0,2" InputTransparent="True"/>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <CollectionView x:Name="MatchList" Grid.Row="3" SelectionMode="None" Margin="0,5,0,0">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"/>
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.Footer>
+                    <BoxView HeightRequest="60" Color="Transparent"/>
+                </CollectionView.Footer>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border StrokeThickness="0" StrokeShape="RoundRectangle 18" BackgroundColor="{Binding RowBackgroundColor}" HeightRequest="75">
+                            <Grid ColumnDefinitions="65, *, 70" Padding="0">
+
+                                <Border Grid.Column="0" StrokeThickness="0" BackgroundColor="#1A1A1A" StrokeShape="RoundRectangle 18,0,0,18">
+                                    <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="0">
+                                        <Label Text="{Binding DisplayTime}" 
+                                               HorizontalTextAlignment="Center" 
+                                               TextColor="#0A84FF" FontSize="13" FontAttributes="Bold"/>
+                                    </StackLayout>
+                                </Border>
+
+                                <StackLayout Grid.Column="1" VerticalOptions="Center" Padding="12,0" Spacing="3">
+                                    <Label Text="{Binding LeagueName}" TextColor="{Binding LeagueColor}" FontSize="9" TextTransform="Uppercase" FontAttributes="Bold" Opacity="0.8"/>
+                                    <Label Text="{Binding MatchTitle}" TextColor="White" FontSize="14" FontAttributes="Bold" MaxLines="2" LineBreakMode="TailTruncation"/>
+                                </StackLayout>
+
+                                <Button Grid.Column="2" 
+                                        Text="COPY"
+                                        FontSize="10"
+                                        FontAttributes="Bold"
+                                        HeightRequest="30"
+                                        WidthRequest="60"
+                                        CornerRadius="15"
+                                        BackgroundColor="#2C2C2E"
+                                        TextColor="White"
+                                        VerticalOptions="Center"
+                                        HorizontalOptions="Center"
+                                        Clicked="OnSaoChepClicked"
+                                        CommandParameter="{Binding .}"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </Grid>
+    </Grid>
+</ContentPage>
